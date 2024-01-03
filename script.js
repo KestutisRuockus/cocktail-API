@@ -13,36 +13,68 @@ const cocktailNameFilterElement = document.querySelector(
   categorySelectName = document.querySelector("#category-select"),
   glassSelectName = document.querySelector("#glass-type-select"),
   ingredientSelectName = document.querySelector("#ingredient-select"),
-  dynamicDrinkElement = document.querySelector(".drinks");
+  dynamicDrinkElement = document.querySelector(".drinks"),
+  btnSearch = document.querySelector("#search");
 
-const categoriesArray = [],
-  drinksArray = [];
+const selectValues = {};
+const drinksArray = [];
 
+// get properties to drop list (select elements)
 async function fillSelectElemets() {
-  await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list")
-    .then((response) => response.json())
-    .then((response) => {
-      fillSelectOptions(response.drinks, categorySelectName, "strCategory");
-      // 'Map' metodas grazina is objekto masyvu objektu laukus strCategory
-      categoriesArray.push(
-        ...response.drinks.map((value) => value.strCategory)
-      );
-    })
-    .catch((error) => console.log(error));
+  const allUrls = [
+    "https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list",
+    "https://www.thecocktaildb.com/api/json/v1/1/list.php?g=list",
+    "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list",
+  ];
 
-  // fill glass options
-  await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?g=list")
-    .then((response) => response.json())
-    .then((response) =>
-      fillSelectOptions(response.drinks, glassSelectName, "strGlass")
-    );
+  const allPromises = allUrls.map((url) =>
+    fetch(url).then((response) => response.json())
+  );
+  const allValues = await Promise.all(allPromises);
+  console.log(allValues);
 
-  // fill ingredients options
-  await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list")
-    .then((response) => response.json())
-    .then((response) =>
-      fillSelectOptions(response.drinks, ingredientSelectName, "strIngredient1")
-    );
+  const [allCategories, allGlasses, allIngredients] = allValues;
+  selectValues.categories = allCategories.drinks.map(
+    (category) => category.strCategory
+  );
+  selectValues.glasses = allGlasses.drinks.map((glass) => glass.strGlass);
+  selectValues.ingredients = allIngredients.drinks.map(
+    (ingredient) => ingredient.strIngredient1
+  );
+
+  fillSelectOptions(allCategories.drinks, categorySelectName, "strCategory");
+  fillSelectOptions(allGlasses.drinks, glassSelectName, "strGlass");
+  fillSelectOptions(
+    allIngredients.drinks,
+    ingredientSelectName,
+    "strIngredient1"
+  );
+  //   );
+
+  // await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list")
+  //   .then((response) => response.json())
+  //   .then((response) => {
+  //     fillSelectOptions(response.drinks, categorySelectName, "strCategory");
+  //     // 'Map' metodas grazina is objekto masyvu objektu laukus strCategory
+  //     categoriesArray.push(
+  //       ...response.drinks.map((value) => value.strCategory)
+  //     );
+  //   })
+  //   .catch((error) => console.log(error));
+
+  // // fill glass options
+  // await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?g=list")
+  //   .then((response) => response.json())
+  //   .then((response) =>
+  //     fillSelectOptions(response.drinks, glassSelectName, "strGlass")
+  //   );
+
+  // // fill ingredients options
+  // await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list")
+  //   .then((response) => response.json())
+  //   .then((response) =>
+  //     fillSelectOptions(response.drinks, ingredientSelectName, "strIngredient1")
+  //   );
 }
 
 // display drinks tabs
@@ -61,7 +93,7 @@ function generateDrinksHTML(drinks) {
 
 // get all drinks from API
 async function getAllDrinks() {
-  for (const category of categoriesArray) {
+  for (const category of selectValues.categories) {
     let dynamicUrl = `https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category.replaceAll(
       " ",
       "_"
@@ -80,15 +112,15 @@ function fillSelectOptions(properties, selectElement, strFieldName) {
   for (const property of properties) {
     dynamicHTML += `<option>${property[strFieldName]}</option>`;
   }
-  selectElement.innerHTML = dynamicHTML;
+  selectElement.innerHTML += dynamicHTML;
 }
 
 async function initialization() {
   // 1. selectu uzpildymas
   await fillSelectElemets();
-  console.log(categoriesArray);
   await getAllDrinks();
   generateDrinksHTML(drinksArray);
+  btnSearch.addEventListener("click", filter);
   console.log(drinksArray);
   // 2. dinaminis gerimu atvaizdavimas
 }
