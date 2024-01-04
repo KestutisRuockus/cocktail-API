@@ -71,3 +71,75 @@ nav {
 .drink .drink-title {
   text-align: center;
 }
+
+.modal-bg {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+.modal {
+  position: relative;
+  background-color: #fff;
+  max-width: 500px;
+  width: 50%;
+  max-height: 1000px;
+  height: 70%;
+  overflow-y: scroll;
+  padding: 20px 50px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 3%;
+  right: 3%;
+  font-size: 26px;
+}
+
+.modal-close-btn:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.modal-img {
+  width: 50%;
+  margin: 0 auto;
+  display: block;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+  margin-left: 5%;
+}
+
+.row p {
+  width: 80%;
+  text-align: left;
+}
+
+h1 {
+  text-align: center;
+}
+
+p {
+  margin: 0;
+}
+
+.ingredients {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ingredient span {
+  width: 50%;
+  text-align: left;
+}

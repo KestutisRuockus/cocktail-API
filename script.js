@@ -14,7 +14,9 @@ const cocktailNameFilterElement = document.querySelector(
   glassSelectName = document.querySelector("#glass-type-select"),
   ingredientSelectName = document.querySelector("#ingredient-select"),
   dynamicDrinkElement = document.querySelector(".drinks"),
-  btnSearch = document.querySelector("#search");
+  btnSearch = document.querySelector("#search"),
+  modal = document.querySelector(".modal-bg"),
+  modalCloseBtn = document.querySelector(".modal-close-btn");
 
 const selectValues = {};
 const drinksArray = [];
@@ -55,7 +57,7 @@ async function fillSelectElemets() {
 function generateDrinksHTML(drinks) {
   let dynamicHTML = ``;
   for (const drink of drinks) {
-    dynamicHTML += `<div class="drink">
+    dynamicHTML += `<div onclick='openModal(${drink.idDrink})' class="drink">
     <img
       src="${drink.strDrinkThumb}"
     />
@@ -164,4 +166,77 @@ async function initialization() {
   btnSearch.addEventListener("click", filter);
 }
 
+async function openModal(id) {
+  modal.style.display = "flex";
+  const response = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`
+  );
+  const obj = await response.json();
+  const drink = obj.drinks[0];
+  console.log(drink);
+  generateRecipeInModal(drink);
+}
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+// allValues.forEach((value) => drinksArray.push(...value.drinks));
+function generateRecipeInModal(drink) {
+  let ingredients = [];
+  let ingredientsMeasure = [];
+  let ingredientsHTML = ``;
+  document.querySelector("#modal-title").innerText = drink.strDrink;
+  document.querySelector("#modal-category").innerText = drink.strCategory;
+  document.querySelector("#modal-alcohol").innerText = drink.strAlcoholic;
+  document.querySelector("#modal-glass").innerText = drink.strGlass;
+  document.querySelector("#modal-recipe").innerText = drink.strInstructions;
+  document.querySelector("#modal-img").src = drink.strDrinkThumb;
+
+  ingredients.push(drink.strIngredient1);
+  ingredientsMeasure.push(drink.strMeasure1);
+  ingredients.push(drink.strIngredient2);
+  ingredientsMeasure.push(drink.strMeasure2);
+  ingredients.push(drink.strIngredient3);
+  ingredientsMeasure.push(drink.strMeasure3);
+  ingredients.push(drink.strIngredient4);
+  ingredientsMeasure.push(drink.strMeasure4);
+  ingredients.push(drink.strIngredient5);
+  ingredientsMeasure.push(drink.strMeasure5);
+  ingredients.push(drink.strIngredient6);
+  ingredientsMeasure.push(drink.strMeasure6);
+  ingredients.push(drink.strIngredient7);
+  ingredientsMeasure.push(drink.strMeasure7);
+  ingredients.push(drink.strIngredient8);
+  ingredientsMeasure.push(drink.strMeasure8);
+  ingredients.push(drink.strIngredient9);
+  ingredientsMeasure.push(drink.strMeasure9);
+  ingredients.push(drink.strIngredient10);
+  ingredientsMeasure.push(drink.strMeasure10);
+  ingredients.push(drink.strIngredient11);
+  ingredientsMeasure.push(drink.strMeasure11);
+  ingredients.push(drink.strIngredient12);
+  ingredientsMeasure.push(drink.strMeasure12);
+  ingredients.push(drink.strIngredient13);
+  ingredientsMeasure.push(drink.strMeasure13);
+  ingredients.push(drink.strIngredient14);
+  ingredientsMeasure.push(drink.strMeasure14);
+  ingredients.push(drink.strIngredient15);
+  ingredientsMeasure.push(drink.strMeasure15);
+
+  // for (const ingredient of ingredients) {
+  ingredients.forEach((ingredient, index) => {
+    let measure = ``;
+    if (ingredient !== null) {
+      measure = ingredientsMeasure[index];
+      if (measure !== null)
+        ingredientsHTML += `<p class="ingredient"><b>${ingredient}:</b>${measure}<span></span></p>`;
+      else
+        ingredientsHTML += `<p class="ingredient"><b>${ingredient}:</b><span></span></p>`;
+    }
+  });
+  document.querySelector("#modal-ingredients").innerHTML = ingredientsHTML;
+}
+
+modalCloseBtn.addEventListener("click", closeModal);
 initialization();
