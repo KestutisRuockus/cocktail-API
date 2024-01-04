@@ -31,7 +31,6 @@ async function fillSelectElemets() {
     fetch(url).then((response) => response.json())
   );
   const allValues = await Promise.all(allPromises);
-  console.log(allValues);
 
   const [allCategories, allGlasses, allIngredients] = allValues;
   selectValues.categories = allCategories.drinks.map(
@@ -49,34 +48,9 @@ async function fillSelectElemets() {
     ingredientSelectName,
     "strIngredient1"
   );
-  //   );
-
-  // await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list")
-  //   .then((response) => response.json())
-  //   .then((response) => {
-  //     fillSelectOptions(response.drinks, categorySelectName, "strCategory");
-  //     // 'Map' metodas grazina is objekto masyvu objektu laukus strCategory
-  //     categoriesArray.push(
-  //       ...response.drinks.map((value) => value.strCategory)
-  //     );
-  //   })
-  //   .catch((error) => console.log(error));
-
-  // // fill glass options
-  // await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?g=list")
-  //   .then((response) => response.json())
-  //   .then((response) =>
-  //     fillSelectOptions(response.drinks, glassSelectName, "strGlass")
-  //   );
-
-  // // fill ingredients options
-  // await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list")
-  //   .then((response) => response.json())
-  //   .then((response) =>
-  //     fillSelectOptions(response.drinks, ingredientSelectName, "strIngredient1")
-  //   );
 }
 
+// 3.
 // display drinks tabs
 function generateDrinksHTML(drinks) {
   let dynamicHTML = ``;
@@ -93,17 +67,19 @@ function generateDrinksHTML(drinks) {
 
 // get all drinks from API
 async function getAllDrinks() {
+  const categoryDrinksUrls = [];
   for (const category of selectValues.categories) {
     let dynamicUrl = `https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category.replaceAll(
       " ",
       "_"
     )}`;
-    const response = await fetch(dynamicUrl);
-    const answerFromServer = await response.json();
-    for (const drink of answerFromServer.drinks) {
-      drinksArray.push(drink);
-    }
+    categoryDrinksUrls.push(dynamicUrl);
   }
+  const allPromises = categoryDrinksUrls.map((url) =>
+    fetch(url).then((response) => response.json())
+  );
+  const allValues = await Promise.all(allPromises);
+  allValues.forEach((value) => drinksArray.push(...value.drinks));
 }
 
 // fill select element with options from API
@@ -115,14 +91,77 @@ function fillSelectOptions(properties, selectElement, strFieldName) {
   selectElement.innerHTML += dynamicHTML;
 }
 
+async function filter() {
+  const searchValue = cocktailNameFilterElement.value,
+    category = categorySelectName.value,
+    glass = glassSelectName.value,
+    ingredient = ingredientSelectName.value;
+  let filteredArray = [...drinksArray];
+
+  // paieska pagal pavadinima
+  if (searchValue) {
+    filteredArray = filteredArray.filter((obj) =>
+      obj.strDrink.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    generateDrinksHTML(filteredArray);
+  }
+
+  // paieska pagal kategorija
+  if (category !== "Pasirinkite kategoriją") {
+    const response = await fetch(
+      `https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category.replaceAll(
+        " ",
+        "_"
+      )}`
+    );
+    const drinksOfCategory = await response.json();
+    filteredArray = filteredArray.filter((drink) =>
+      drinksOfCategory.drinks.some(
+        (drinkOfCategory) => drink.idDrink === drinkOfCategory.idDrink
+      )
+    );
+  }
+
+  // paieska pagal stikline
+  if (glass !== "Pasirinkite stiklinės tipą") {
+    const response = await fetch(
+      `https://www.thecocktaildb.com/api/json/v1/1/filter.php?g=${glass.replaceAll(
+        " ",
+        "_"
+      )}`
+    );
+    const drinksOfGlass = await response.json();
+    filteredArray = filteredArray.filter((drink) =>
+      drinksOfGlass.drinks.some(
+        (drinkOfGlass) => drink.idDrink === drinkOfGlass.idDrink
+      )
+    );
+  }
+
+  // paieska pagal ingredienta
+  if (ingredient !== "Pasirinkite ingredientą") {
+    const response = await fetch(
+      `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${ingredient.replaceAll(
+        " ",
+        "_"
+      )}`
+    );
+    const drinksOfIngredients = await response.json();
+    filteredArray = filteredArray.filter((drink) =>
+      drinksOfIngredients.drinks.some(
+        (drinkOfIngredient) => drink.idDrink === drinkOfIngredient.idDrink
+      )
+    );
+  }
+  generateDrinksHTML(filteredArray);
+}
+
+// 1. 2.
 async function initialization() {
-  // 1. selectu uzpildymas
   await fillSelectElemets();
   await getAllDrinks();
   generateDrinksHTML(drinksArray);
   btnSearch.addEventListener("click", filter);
-  console.log(drinksArray);
-  // 2. dinaminis gerimu atvaizdavimas
 }
 
 initialization();
