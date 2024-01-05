@@ -174,7 +174,6 @@ async function openModal(id) {
   );
   const obj = await response.json();
   const drink = obj.drinks[0];
-  console.log(drink);
   generateRecipeInModal(drink);
   modal.style.display = "flex";
 }
@@ -251,6 +250,20 @@ async function imLucky() {
   const drink = obj.drinks[0];
   generateRecipeInModal(drink);
   modal.style.display = "flex";
+}
+
+// get and display alcoholic or alcohol-free drinks list by clicking on a link in modal
+async function getDrinksByAlcoholicOrNotAlcoholic() {
+  const link = document.querySelector("#modal-alcohol").innerText;
+  const response = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=${link.replaceAll(
+      " ",
+      "_"
+    )}`
+  );
+  const obj = await response.json();
+  const drinks = obj.drinks;
+  generateDrinksHTML(drinks);
 }
 
 imLuckyBtn.addEventListener("click", imLucky);
