@@ -147,3 +147,20 @@ p {
 a:visited {
   color: blue;
 }
+
+.letter-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding-bottom: 5px;
+  font-size: 32px;
+}
+
+.letter-container a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.letter-container a:hover {
+  color: rgb(129, 63, 63);
+}

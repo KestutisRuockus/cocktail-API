@@ -161,6 +161,7 @@ async function filter() {
 
 // 1. 2.
 async function initialization() {
+  createAlphabeticalLinks();
   await fillSelectElemets();
   await getAllDrinks();
   generateDrinksHTML(drinksArray);
@@ -264,6 +265,35 @@ async function getDrinksByAlcoholicOrNotAlcoholic() {
   const obj = await response.json();
   const drinks = obj.drinks;
   generateDrinksHTML(drinks);
+  modal.style.display = "none";
+}
+
+// display alphabet letters and numbers
+function createAlphabeticalLinks() {
+  let alphabetHTML = ``;
+  for (let i = 65; i <= 90; i++) {
+    let char = String.fromCharCode(i);
+    alphabetHTML += `<a onclick="getDrinksListByChar('${char}')" href="#">${char}</a>`;
+  }
+  for (let i = 48; i <= 57; i++) {
+    let char = String.fromCharCode(i);
+    alphabetHTML += `<a onclick="getDrinksListByChar('${char.toLowerCase()}')" href="#">${char}</a>`;
+  }
+  document.querySelector(".letter-container").innerHTML = alphabetHTML;
+}
+
+// get and display drinks from first selected letter or number
+async function getDrinksListByChar(char) {
+  const response = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${char}`
+  );
+  const obj = await response.json();
+  const drinks = obj.drinks;
+  if (drinks !== null) {
+    generateDrinksHTML(drinks);
+  } else {
+    alert(`Drink list of symbol '${char}' is empty`);
+  }
 }
 
 imLuckyBtn.addEventListener("click", imLucky);
