@@ -16,7 +16,8 @@ const cocktailNameFilterElement = document.querySelector(
   dynamicDrinkElement = document.querySelector(".drinks"),
   btnSearch = document.querySelector("#search"),
   modal = document.querySelector(".modal-bg"),
-  modalCloseBtn = document.querySelector(".modal-close-btn");
+  modalCloseBtn = document.querySelector(".modal-close-btn"),
+  imLuckyBtn = document.querySelector("#im-lucky");
 
 const selectValues = {};
 const drinksArray = [];
@@ -166,8 +167,8 @@ async function initialization() {
   btnSearch.addEventListener("click", filter);
 }
 
+// open modal with recipe information when clicked on drink element
 async function openModal(id) {
-  modal.style.display = "flex";
   const response = await fetch(
     `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`
   );
@@ -175,13 +176,15 @@ async function openModal(id) {
   const drink = obj.drinks[0];
   console.log(drink);
   generateRecipeInModal(drink);
+  modal.style.display = "flex";
 }
 
+// close modal when close btn clicked
 function closeModal() {
   modal.style.display = "none";
 }
 
-// allValues.forEach((value) => drinksArray.push(...value.drinks));
+// display selected drink in modal
 function generateRecipeInModal(drink) {
   let ingredients = [];
   let ingredientsMeasure = [];
@@ -238,5 +241,18 @@ function generateRecipeInModal(drink) {
   document.querySelector("#modal-ingredients").innerHTML = ingredientsHTML;
 }
 
+// get random drink from API and display it in opened modal
+// https://www.thecocktaildb.com/api/json/v1/1/random.php
+async function imLucky() {
+  const response = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/random.php`
+  );
+  const obj = await response.json();
+  const drink = obj.drinks[0];
+  generateRecipeInModal(drink);
+  modal.style.display = "flex";
+}
+
+imLuckyBtn.addEventListener("click", imLucky);
 modalCloseBtn.addEventListener("click", closeModal);
 initialization();
