@@ -6,6 +6,7 @@
 body {
   font-family: "Single Day", cursive;
   margin: 0;
+  background-color: rgba(189, 183, 107, 0.473);
 }
 
 .container {
@@ -55,12 +56,17 @@ nav {
 
 .drink {
   width: 80%;
+  height: 400px;
   margin: 0 auto;
-  box-shadow: 1px 2px 10px gray;
+  box-shadow: 7px 10px 10px darkolivegreen;
   border-radius: 6px;
+  transition: width 0.5s, box-shadow 0.5s;
+  background-color: #fff;
 }
 .drink:hover {
   cursor: pointer;
+  width: calc(80% + 20px);
+  box-shadow: 15px 18px 18px darkslateblue;
 }
 
 .drink img {
@@ -159,6 +165,7 @@ a:visited {
 .letter-container a {
   text-decoration: none;
   color: #fff;
+  transition: color 0.2s;
 }
 
 .letter-container a:hover {
