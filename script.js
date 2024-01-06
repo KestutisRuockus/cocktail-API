@@ -156,6 +156,15 @@ async function filter() {
       )
     );
   }
+
+  const filters = {
+    searchValue: searchValue,
+    category: category,
+    glass: glass,
+    ingredient: ingredient,
+  };
+
+  localStorage.setItem("drinks-search-filters", JSON.stringify(filters));
   generateDrinksHTML(filteredArray);
 }
 
@@ -164,6 +173,7 @@ async function initialization() {
   createAlphabeticalLinks();
   await fillSelectElemets();
   await getAllDrinks();
+  getFiltersFromLocalStorage();
   generateDrinksHTML(drinksArray);
   btnSearch.addEventListener("click", filter);
 }
@@ -242,7 +252,6 @@ function generateRecipeInModal(drink) {
 }
 
 // get random drink from API and display it in opened modal
-// https://www.thecocktaildb.com/api/json/v1/1/random.php
 async function imLucky() {
   const response = await fetch(
     `https://www.thecocktaildb.com/api/json/v1/1/random.php`
@@ -294,6 +303,20 @@ async function getDrinksListByChar(char) {
   } else {
     alert(`Drink list of symbol '${char}' is empty`);
   }
+}
+
+// set current filters to localStorage
+function setFiltersToLocalStorage(filters) {
+  localStorage.setItem("drinks-search-filters", filters);
+}
+
+// get current filters from localStorage
+function getFiltersFromLocalStorage() {
+  const filters = JSON.parse(localStorage.getItem("drinks-search-filters"));
+  cocktailNameFilterElement.value = filters.searchValue;
+  categorySelectName.value = filters.category;
+  glassSelectName.value = filters.glass;
+  ingredientSelectName.value = filters.ingredient;
 }
 
 imLuckyBtn.addEventListener("click", imLucky);
