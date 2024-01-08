@@ -53,8 +53,8 @@ async function fillSelectElemets() {
   );
 }
 
-// 3.
 // display drinks tabs
+// @drinks - objects array
 function generateDrinksHTML(drinks) {
   let dynamicHTML = ``;
   for (const drink of drinks) {
@@ -86,6 +86,9 @@ async function getAllDrinks() {
 }
 
 // fill select element with options from API
+// @properties - category to fill
+// @selectElement - to which element append properties
+// @strFieldName - object entries
 function fillSelectOptions(properties, selectElement, strFieldName) {
   let dynamicHTML = ``;
   for (const property of properties) {
@@ -94,6 +97,7 @@ function fillSelectOptions(properties, selectElement, strFieldName) {
   selectElement.innerHTML += dynamicHTML;
 }
 
+// search by filters (name, category, glass type, ingredients)
 async function filter() {
   const searchValue = cocktailNameFilterElement.value,
     category = categorySelectName.value,
@@ -101,7 +105,7 @@ async function filter() {
     ingredient = ingredientSelectName.value;
   let filteredArray = [...drinksArray];
 
-  // paieska pagal pavadinima
+  // filter by name
   if (searchValue) {
     filteredArray = filteredArray.filter((obj) =>
       obj.strDrink.toLowerCase().includes(searchValue.toLowerCase())
@@ -109,7 +113,7 @@ async function filter() {
     generateDrinksHTML(filteredArray);
   }
 
-  // paieska pagal kategorija
+  // filter by category
   if (category !== "Pasirinkite kategoriją") {
     const response = await fetch(
       `https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category.replaceAll(
@@ -125,7 +129,7 @@ async function filter() {
     );
   }
 
-  // paieska pagal stikline
+  // filter by galss type
   if (glass !== "Pasirinkite stiklinės tipą") {
     const response = await fetch(
       `https://www.thecocktaildb.com/api/json/v1/1/filter.php?g=${glass.replaceAll(
@@ -141,7 +145,7 @@ async function filter() {
     );
   }
 
-  // paieska pagal ingredienta
+  // filter by ingredient
   if (ingredient !== "Pasirinkite ingredientą") {
     const response = await fetch(
       `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${ingredient.replaceAll(
@@ -164,11 +168,12 @@ async function filter() {
     ingredient: ingredient,
   };
 
+  // on button click save inputs/selects values to localStorage
   localStorage.setItem("drinks-search-filters", JSON.stringify(filters));
   generateDrinksHTML(filteredArray);
 }
 
-// 1. 2.
+// load on page start
 async function initialization() {
   createAlphabeticalLinks();
   await fillSelectElemets();
@@ -179,6 +184,7 @@ async function initialization() {
 }
 
 // open modal with recipe information when clicked on drink element
+// @id - recipe id
 async function openModal(id) {
   const response = await fetch(
     `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`
@@ -195,6 +201,7 @@ function closeModal() {
 }
 
 // display selected drink in modal
+// @drink - object passed by id
 function generateRecipeInModal(drink) {
   let ingredients = [];
   let ingredientsMeasure = [];
@@ -251,7 +258,7 @@ function generateRecipeInModal(drink) {
   document.querySelector("#modal-ingredients").innerHTML = ingredientsHTML;
 }
 
-// get random drink from API and display it in opened modal
+// get random drink from API and display it in modal
 async function imLucky() {
   const response = await fetch(
     `https://www.thecocktaildb.com/api/json/v1/1/random.php`
@@ -292,6 +299,7 @@ function createAlphabeticalLinks() {
 }
 
 // get and display drinks from first selected letter or number
+// @char - passed character
 async function getDrinksListByChar(char) {
   const response = await fetch(
     `https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${char}`
@@ -305,12 +313,7 @@ async function getDrinksListByChar(char) {
   }
 }
 
-// set current filters to localStorage
-function setFiltersToLocalStorage(filters) {
-  localStorage.setItem("drinks-search-filters", filters);
-}
-
-// get current filters from localStorage
+// get and display last filters into inputs/selects elements from localStorage on refreshing page
 function getFiltersFromLocalStorage() {
   const filters = JSON.parse(localStorage.getItem("drinks-search-filters"));
   cocktailNameFilterElement.value = filters.searchValue;
